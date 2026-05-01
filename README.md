@@ -254,37 +254,5 @@ For more help, see this README section above.
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** — see [LICENSE](LICENSE) file for details.
-
-**Disclaimer:** This software is for **educational and authorized security testing only**. Unauthorized access to networks or systems is illegal. Users are responsible for complying with all applicable laws and regulations.
-
----
-
-## 🙏 Acknowledgments
-
-- Built with [Scapy](https://scapy.readthedocs.io/) — powerful packet manipulation library
-- Inspired by real-world IDS systems like Snort and Zeek
-- Created for cybersecurity education and learning
-
----
-
-## 📞 Support & Questions
-
-- 📖 **Documentation**: See this README file
-- 🐛 **Report bugs**: Open a GitHub Issue with reproducible steps
-- 💬 **Discussions**: Ask questions in GitHub Discussions
-- 🤝 **Contribute**: Submit a pull request or issue on GitHub
-
----
-
-## 📈 Project Statistics
-
-- **Language**: Python 3
-- **Lines of Code**: ~500
-- **Dependencies**: Scapy only
-- **Last Updated**: 2026
-- **Status**: Stable & Maintained
 
 
