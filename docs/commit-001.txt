@@ -1,0 +1,3 @@
+Commit 1: minor housekeeping file to create a separate commit
+
+This file was added to create commit #1 as requested. It has no functional effect.
