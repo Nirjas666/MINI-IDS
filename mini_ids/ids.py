@@ -23,6 +23,7 @@ from .config import (
     TIME_WINDOW,
     DEFAULT_INTERFACE,
 )
+from .schemas import normalize_packet
 
 # Data structures for sliding-window counters
 # For each src IP we keep deques of timestamps (seconds) for different event types
@@ -59,37 +60,7 @@ def prune_deque(dq: deque, window_seconds: int):
 
 def packet_record(pkt):
     """Create a dict record for CSV logging from a Scapy packet."""
-    rec = {
-        "timestamp_utc": datetime.utcnow().isoformat(),
-        "src_ip": "",
-        "dst_ip": "",
-        "proto": "",
-        "sport": "",
-        "dport": "",
-        "len": len(pkt),
-        "info": "",
-    }
-    if IP in pkt:
-        rec["src_ip"] = pkt[IP].src
-        rec["dst_ip"] = pkt[IP].dst
-        if TCP in pkt:
-            rec["proto"] = "TCP"
-            rec["sport"] = pkt[TCP].sport
-            rec["dport"] = pkt[TCP].dport
-            rec["info"] = pkt.sprintf("%IP.src%:%TCP.sport% -> %IP.dst%:%TCP.dport% Flags=%TCP.flags%")
-        elif UDP in pkt:
-            rec["proto"] = "UDP"
-            rec["sport"] = pkt[UDP].sport
-            rec["dport"] = pkt[UDP].dport
-            rec["info"] = pkt.sprintf("%IP.src%:%UDP.sport% -> %IP.dst%:%UDP.dport%")
-        elif ICMP in pkt:
-            rec["proto"] = "ICMP"
-            rec["info"] = pkt.sprintf("%IP.src% -> %IP.dst% ICMP type=%ICMP.type% code=%ICMP.code%")
-        else:
-            rec["proto"] = str(pkt[IP].proto)
-    else:
-        rec["info"] = pkt.summary()
-    return rec
+    return normalize_packet(pkt)
 
 
 def handle_packet(pkt):
@@ -237,3 +208,28 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, stop_gracefully)
     signal.signal(signal.SIGTERM, stop_gracefully)
     start_sniffer()
+
+
+def main():
+    """Console entry point used by the package script."""
+    import sys
+
+    interface = sys.argv[1] if len(sys.argv) > 1 else None
+
+    def stop_gracefully_cli(signum, frame):
+        print("\n[INFO] Stopping sniffer...")
+        stop_sniff.set()
+
+    signal.signal(signal.SIGINT, stop_gracefully_cli)
+    signal.signal(signal.SIGTERM, stop_gracefully_cli)
+
+    print(f"[INFO] Starting Mini IDS sniffer on interface: {interface or 'default'}")
+    try:
+        start_sniffer(interface=interface)
+    except PermissionError:
+        print("[ERROR] PermissionError: This script requires root/administrator privileges.")
+        print("[INFO] Run with: sudo python3 run_ids.py")
+        raise SystemExit(1)
+    except Exception as exc:
+        print(f"[ERROR] {type(exc).__name__}: {exc}")
+        raise SystemExit(1)

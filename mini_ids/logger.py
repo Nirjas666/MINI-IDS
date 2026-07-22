@@ -61,11 +61,22 @@ def init_csv():
     if not os.path.exists(CSV_LOG):
         with open(CSV_LOG, "w", newline='', encoding='utf-8') as f:
             writer = csv.writer(f)
-            writer.writerow(["timestamp_utc", "src_ip", "dst_ip", "proto", "sport", "dport", "len", "info"]) 
+            writer.writerow([
+                "timestamp_utc",
+                "src_ip",
+                "dst_ip",
+                "protocol",
+                "src_port",
+                "dst_port",
+                "packet_size",
+                "flags",
+                "connection_info",
+                "info",
+            ])
 
 
 def log_packet_csv(record: Dict):
-    """Append a packet record (dict) to CSV. Expected keys: timestamp_utc, src_ip, dst_ip, proto, sport, dport, len, info."""
+    """Append a packet record (dict) to CSV."""
     init_csv()
     with open(CSV_LOG, "a", newline='', encoding='utf-8') as f:
         writer = csv.writer(f)
@@ -73,9 +84,11 @@ def log_packet_csv(record: Dict):
             record.get("timestamp_utc", ""),
             record.get("src_ip", ""),
             record.get("dst_ip", ""),
-            record.get("proto", ""),
-            record.get("sport", ""),
-            record.get("dport", ""),
-            record.get("len", ""),
-            record.get("info", ""),
+            record.get("protocol", record.get("proto", "")),
+            record.get("src_port", record.get("sport", "")),
+            record.get("dst_port", record.get("dport", "")),
+            record.get("packet_size", record.get("len", "")),
+            record.get("flags", ""),
+            record.get("connection_info", ""),
+            record.get("info", record.get("raw_summary", "")),
         ])
